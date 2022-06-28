@@ -37,15 +37,15 @@ Cypress.Commands.add('token', (email, senha) => {
     })
  })
 
- Cypress.Commands.add('cadastrarUsuario' , (nome, email, senha) =>{
+ Cypress.Commands.add('cadastrarUsuario' , (usuario, email, senha, admin) =>{
     cy.request({
         method: 'POST', 
         url: 'usuarios', 
         body: {
-            "nome": nome,
+            "nome": usuario,
             "email": email,
             "senha": senha,
-            "administrador": true
+            "administrador": admin
         },
         failOnStatusCode: false
     })

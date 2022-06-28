@@ -13,7 +13,7 @@ describe('Testes da Funcionalidade Usuários', () => {
                method: 'GET',
                url: 'usuarios'
           }).then((response) => {
-               expect(response.body.usuarios[0].nome).to.equal('Fulano da Silva')
+               expect(response.body.quantidade)
                expect(response.status).to.equal(200)
                expect(response.body).to.have.property('usuarios')
                expect(response.duration).to.be.lessThan(15)
@@ -21,18 +21,20 @@ describe('Testes da Funcionalidade Usuários', () => {
      });
 
      it('Deve cadastrar um usuário com sucesso', () => {
+          let email = `usuario${Math.floor(Math.random() * 1000)}@teste.com`
           cy.request({
                method: 'POST',
                url: 'usuarios',
                body: {
-                    "nome": "Fulano da Silva",
-                    "email": "beltrano@qa.com.br",
+                    "nome": "usuario123 da Silva",
+                    "email": email,
                     "password": "teste",
                     "administrador": "true"
                },
           }).then((response) => {
                expect(response.status).to.equal(201)
                expect(response.body.message).to.equal('Cadastro realizado com sucesso')
+               cy.log(response.body._id)
           })
      });
 
@@ -41,20 +43,22 @@ describe('Testes da Funcionalidade Usuários', () => {
                method: 'POST',
                url: 'usuarios',
                body: {
-                    "nome": "Fulano da Silva",
-                    "email": "123@ig.com",
+                    "nome": "usuario123 da Silva",
+                    "email": "pessoa123@qa.com.br",
                     "password": "teste",
                     "administrador": "true"
-               },failOnStatusCode: false
+               },
+               failOnStatusCode: false
+
           }).then((response) => {
-               expect(response.status).to.equal(201)
-               expect(response.body.message).to.equal('Cadastro realizado com sucesso')
+               expect(response.status).to.equal(400)
+               expect(response.body.message).to.equal('Este email já está sendo usado')
           })
      });
 
      it('Deve editar um usuário previamente cadastrado', () => {
           cy.request('usuarios').then(response => {
-              let id = response.body.usuarios[0]._id
+               let id = response.body.usuarios[0]._id
                cy.request({
                     method: 'PUT',
                     url: `usuarios/${id}`,
@@ -68,20 +72,22 @@ describe('Testes da Funcionalidade Usuários', () => {
                }).then((response) => {
                     expect(response.body.message).to.equal('Registro alterado com sucesso')
                     expect(response.status).to.equal(200)
-               }) 
-          })   
+               })
+          })
      });
 
      it('Deve deletar um usuário previamente cadastrado', () => {
-          cy.request('usuarios').then(response => {
-               let id = response.body.usuarios[0]._id
-               cy.request({
-                    method: 'DELETE',
-                    url: `usuarios/${id}`
-               }).then(response => {
-                    expect(response.body.message).to.equal('Registro excluído com sucesso')
-                    expect(response.status).to.equal(200)
+          let email = `usuario${Math.floor(Math.random() * 1000)}@teste.com`
+          cy.cadastrarUsuario('anonimo', email, 'teste', 'true')
+               .then(response => {
+                    let id = response.body._id
+                    cy.request({
+                         method: 'DELETE',
+                         url: `usuarios/${id}`
+                    }).then(response => {
+                         expect(response.body.message).to.equal('Registro excluído com sucesso')
+                         expect(response.status).to.equal(200)
+                    })
                })
-          })
      })
 });
