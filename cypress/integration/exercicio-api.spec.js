@@ -78,7 +78,7 @@ describe('Testes da Funcionalidade Usuários', () => {
 
      it('Deve deletar um usuário previamente cadastrado', () => {
           let email = `usuario${Math.floor(Math.random() * 1000)}@teste.com`
-          cy.cadastrarUsuario('anonimo', email, 'teste', 'true')
+          cy.cadastrarUsuario('usuario84', email, 'teste', 'true')
                .then(response => {
                     let id = response.body._id
                     cy.request({
